@@ -23,23 +23,24 @@ export default {
     const nameFilter = ref('');
     const statusFilter = ref('');
 
-    onMounted(async () => {
+    onMounted(async () => {//Данная функция  вызывается после того, как компонент Vue был добавлен на страницу
       fetchCharacters();
     });
 
-    const fetchCharacters = async () => {
+    const fetchCharacters = async () => {//Здесь мы получаем данные с API и при успешной операции записываем  в формат JSON
+
       try {
         const response = await fetch('https://rickandmortyapi.com/api/character');
         const data = await response.json();
-        characters.value = data.results;
+        characters.value = data.results;// Переменная character, отвечает за отображение информации о персонажах с API
       } catch (error) {
-        console.error("Ошибка при получении данных от API", error);
+        console.error("Ошибка при получении данных с API", error);
       }
     };
 
     const totalPages = computed(() => Math.ceil(characters.value.length / itemsPerPage));
-
-    const paginatedCharacters = computed(() => {
+    //Определяет общие число страниц в  пагинации
+    const paginatedCharacters = computed(() => {//Фильтрация персонажей по имени и статусу 
       const start = (currentPage.value - 1) * itemsPerPage;
       const end = currentPage.value * itemsPerPage;
       return characters.value
@@ -48,20 +49,20 @@ export default {
         .slice(start, end);
     });
 
-    const nextPage = () => {
+    const nextPage = () => {//Функция для перехода на следующую страницу
       if (currentPage.value < totalPages.value) {
         currentPage.value++;
       }
     };
 
-    const previousPage = () => {
+    const previousPage = () => {//Функция для перехода на предыдущую страницу
       if (currentPage.value > 1) {
         currentPage.value--;
       }
     };
 
     const applyFilters = () => {
-      currentPage.value = 1; // Сбросить на первую страницу при применении фильтров
+      currentPage.value = 1; // Возвращает на первую страницу при применении фильтров
     };
 
     return {
@@ -78,12 +79,3 @@ export default {
   }
 };
 </script>
-
-
-<style scoped>
-p {
-  color: blueviolet;
-  font-size: larger;
-  font-style: oblique 90deg;
-}
-</style>
