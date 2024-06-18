@@ -1,7 +1,10 @@
 <template>
   <div>
-    <button @click="previousPage" :disabled="currentPage === 1">Previous Page</button>
-    <button @click="nextPage" :disabled="currentPage === totalPages">Next Page</button>
+    <input v-model="nameFilter" placeholder="Фильтр по имени">
+    <input v-model="statusFilter" placeholder="Фильтр по статусу">
+    <button @click="applyFilters">Применить</button>
+    <button @click="previousPage" :disabled="currentPage === 1">Предыдущая страница</button>
+    <button @click="nextPage" :disabled="currentPage === totalPages">Следующая страница</button>
     <div v-for="ch in paginatedCharacters" :key="ch.id">
       <img :src="ch.image" alt="Character Image" />
       <h4><p>{{ ch.name }}-{{ ch.status }}</p></h4>
@@ -17,6 +20,8 @@ export default {
     const characters = ref([]);
     const currentPage = ref(1);
     const itemsPerPage = 10;
+    const nameFilter = ref('');
+    const statusFilter = ref('');
 
     onMounted(async () => {
       fetchCharacters();
@@ -37,7 +42,10 @@ export default {
     const paginatedCharacters = computed(() => {
       const start = (currentPage.value - 1) * itemsPerPage;
       const end = currentPage.value * itemsPerPage;
-      return characters.value.slice(start, end);
+      return characters.value
+        .filter(ch => ch.name.toLowerCase().includes(nameFilter.value.toLowerCase()))
+        .filter(ch => ch.status.toLowerCase().includes(statusFilter.value.toLowerCase()))
+        .slice(start, end);
     });
 
     const nextPage = () => {
@@ -52,17 +60,25 @@ export default {
       }
     };
 
+    const applyFilters = () => {
+      currentPage.value = 1; // Сбросить на первую страницу при применении фильтров
+    };
+
     return {
       characters,
       paginatedCharacters,
       nextPage,
       previousPage,
       currentPage,
-      totalPages
+      totalPages,
+      nameFilter,
+      statusFilter,
+      applyFilters
     };
   }
 };
 </script>
+
 
 <style scoped>
 p {
